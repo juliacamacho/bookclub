@@ -1,11 +1,12 @@
 import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError, NotFoundError } from "./errors";
+import { NotAllowedError } from "./errors";
 
 export interface BookDoc extends BaseDoc {
   title: String;
   author: String;
   description: String;
+  numberOfReviews: Number;
   avgRating: Number;
 }
 
@@ -13,10 +14,16 @@ export default class BookConcept {
   public readonly books = new DocCollection<BookDoc>("books");
 
   async getBooks(query: Filter<BookDoc>) {
-    const posts = await this.books.readMany(query, {
+    const books = await this.books.readMany(query, {
       sort: { dateUpdated: -1 },
     });
-    return posts;
+    return books;
+  }
+
+  async updateInfo(_id: ObjectId, update: Partial<BookDoc>) {
+    this.sanitizeUpdate(update);
+    await this.books.updateOne({ _id }, update);
+    return { msg: "Book info successfully updated!" };
   }
 
   private sanitizeUpdate(update: Partial<BookDoc>) {
@@ -27,11 +34,5 @@ export default class BookConcept {
         throw new NotAllowedError(`Cannot update '${key}' field!`);
       }
     }
-  }
-
-  async update(_id: ObjectId, update: Partial<BookDoc>) {
-    this.sanitizeUpdate(update);
-    await this.books.updateOne({ _id }, update);
-    return { msg: "Post successfully updated!" };
   }
 }
