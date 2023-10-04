@@ -136,6 +136,61 @@ class Routes {
     const fromId = (await User.getUserByUsername(from))._id;
     return await Friend.rejectRequest(fromId, user);
   }
+
+  @Router.get("/books")
+  async getBooks(session: WebSessionDoc) {
+    return;
+  }
+
+  @Router.patch("/books/:_id")
+  async updateBook(session: WebSessionDoc, _id: ObjectId) {
+    return;
+  }
+
+  @Router.post("/books/:_id/rating")
+  async addRating(session: WebSessionDoc, _id: ObjectId) {
+    return;
+  }
+
+  @Router.post("/books/:_id/recommend")
+  async sendRecommendation(session: WebSessionDoc, _id: ObjectId) {
+    return;
+  }
+
+  @Router.get("/user/folders")
+  async getUserFolders(session: WebSessionDoc) {
+    return;
+  }
+
+  @Router.get("/user/folders/:folderName")
+  async getUserFolderContents(session: WebSessionDoc, folderName: String) {
+    return;
+  }
+
+  @Router.patch("/books/:_id/:folderName")
+  async updateFolder(session: WebSessionDoc, _id: ObjectId, folderName: String) {
+    return;
+  }
+
+  @Router.get("/user/recommendations")
+  async getUserRecommendations(session: WebSessionDoc) {
+    return;
+  }
+
+  @Router.get("/user/invitations/received")
+  async getUserInvitationsReceived(session: WebSessionDoc) {
+    return;
+  }
+
+  @Router.get("/user/invitations/posted")
+  async getUserInvitationPosted(session: WebSessionDoc) {
+    return;
+  }
+
+  @Router.post("/user/invitations/posted")
+  async postInvitation(session: WebSessionDoc) {
+    return;
+  }
 }
 
 export default getExpressRouter(new Routes());
