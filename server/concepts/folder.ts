@@ -8,7 +8,7 @@ export interface FolderDoc extends BaseDoc {
   items: ObjectId[];
 }
 
-export default class BookConcept {
+export default class FolderConcept {
   public readonly folders = new DocCollection<FolderDoc>("folders");
 
   async getFolders(query: Filter<FolderDoc>) {
@@ -35,14 +35,17 @@ export default class BookConcept {
   }
 
   // async addToFolder(query: Filter<FolderDoc>, owner: ObjectId, name: String, items: ObjectId[]) {
-  async addToFolder(query: Filter<FolderDoc>, items: ObjectId[]) {
+  async addToFolder(query: Filter<FolderDoc>, item: ObjectId) {
     const folder = await this.folders.readOne(query);
     if (folder !== null) {
-      folder.items = folder.items.concat(items);
+      // folder.items = folder.items.concat(items);
+      const newItems = [...folder.items, item];
+      console.log("ITEMS:", newItems);
+      await this.folders.updateOne({ _id: folder._id }, { items: newItems });
+      return { msg: "Added item to folder!" };
     } else {
       throw new NotFoundError(`Folder does not exist!`);
     }
-    return { msg: "Added item to folder!" };
   }
 
   async removeFromFolder(query: Filter<FolderDoc>, owner: ObjectId, name: string, items: ObjectId[]) {

@@ -117,7 +117,7 @@ const operations: operation[] = [
     name: "Add To Folder",
     endpoint: "/api/user/:username/folders/:folderName",
     method: "PATCH",
-    fields: { username: "input", folderName: "input", bookIds: "input" },
+    fields: { username: "input", folderName: "input", bookId: "input" },
   },
 ];
 

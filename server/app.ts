@@ -4,6 +4,7 @@ import UserConcept from "./concepts/user";
 import WebSessionConcept from "./concepts/websession";
 import BookConcept from "./concepts/book";
 import FolderConcept from "./concepts/folder";
+import RecConcept from "./concepts/recommendation";
 
 // App Definition using concepts
 export const WebSession = new WebSessionConcept();
@@ -12,3 +13,4 @@ export const Post = new PostConcept();
 export const Friend = new FriendConcept();
 export const Book = new BookConcept();
 export const Folder = new FolderConcept();
+export const Rec = new RecConcept();

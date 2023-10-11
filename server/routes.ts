@@ -4,7 +4,7 @@ import { Router, getExpressRouter } from "./framework/router";
 
 import { Folder, Book, Friend, Post, User, WebSession } from "./app";
 import { BookDoc } from "./concepts/book";
-// import { FolderDoc } from "./concepts/folder";
+import { FolderDoc } from "./concepts/folder";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -188,16 +188,15 @@ class Routes {
   }
 
   @Router.patch("/user/:username/folders/:folderName")
-  async addToFolder(session: WebSessionDoc, username: string, folderName: string, bookIds: ObjectId[]) {
+  async addToFolder(session: WebSessionDoc, username: string, folderName: string, bookId: ObjectId) {
     const userId = (await User.getUserByUsername(username))._id;
-    return await Folder.addToFolder({ owner: userId, name: folderName }, bookIds);
+    return await Folder.addToFolder({ owner: userId, name: folderName }, bookId);
     // todo: also add syncs
-    // how to add and use $addToSet with $each modifier?
   }
 
   @Router.get("/user/recommendations")
   async getUserRecommendations(session: WebSessionDoc) {
-    return;
+    // const recs = await 
   }
 
   @Router.get("/user/invitations/received")
