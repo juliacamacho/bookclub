@@ -2,9 +2,8 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Folder, Book, Friend, Post, User, WebSession } from "./app";
+import { Rec, Folder, Book, Friend, Post, User, WebSession } from "./app";
 import { BookDoc } from "./concepts/book";
-import { FolderDoc } from "./concepts/folder";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -161,11 +160,6 @@ class Routes {
     // return await Book.updateInfo(_id, update);
   }
 
-  @Router.post("/books/:_id/recommend")
-  async sendRecommendation(session: WebSessionDoc, _id: ObjectId) {
-    return;
-  }
-
   @Router.get("/user/:username/folders")
   async getUserFolders(session: WebSessionDoc, username: string) {
     const userId = (await User.getUserByUsername(username))._id;
@@ -194,9 +188,20 @@ class Routes {
     // todo: also add syncs
   }
 
-  @Router.get("/user/recommendations")
-  async getUserRecommendations(session: WebSessionDoc) {
-    // const recs = await 
+  @Router.get("/user/:username/recommendations")
+  async getUserRecommendations(username: string) {
+    const userId = (await User.getUserByUsername(username))._id;
+    const recs = await Rec.getUserRecs({ userTo: userId });
+    return recs;
+  }
+
+  @Router.post("/books/:_id")
+  async sendRecommendation(_id: ObjectId, usernameTo: string, usernameFrom: string) {
+    console.log("data:", _id, usernameTo, usernameFrom);
+    const userToId = (await User.getUserByUsername(usernameTo))._id;
+    const userFromId = (await User.getUserByUsername(usernameFrom))._id;
+    // // const book = (await Book.getBookByTitle(bookTitle))._id;
+    return await Rec.sendRec(userFromId, userToId, _id);
   }
 
   @Router.get("/user/invitations/received")

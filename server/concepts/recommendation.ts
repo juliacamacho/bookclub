@@ -7,8 +7,8 @@ export interface RecDoc extends BaseDoc {
   book: ObjectId;
 }
 
-export default class RatingConcept {
-  public readonly recs = new DocCollection<RecDoc>("folders");
+export default class RecConcept {
+  public readonly recs = new DocCollection<RecDoc>("recs");
 
   async getUserRecs(query: Filter<RecDoc>) {
     const recs = await this.recs.readMany(query);

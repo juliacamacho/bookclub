@@ -119,6 +119,18 @@ const operations: operation[] = [
     method: "PATCH",
     fields: { username: "input", folderName: "input", bookId: "input" },
   },
+  {
+    name: "Get Recommendations for User",
+    endpoint: "/api/user/:username/recommendations",
+    method: "GET",
+    fields: { username: "input" },
+  },
+  {
+    name: "Send Recommendation",
+    endpoint: "/api/books/:id",
+    method: "POST",
+    fields: { id: "input", usernameTo: "input", usernameFrom: "input" },
+  },
 ];
 
 // Do not edit below here.

@@ -1,6 +1,6 @@
 import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError } from "./errors";
+import { NotAllowedError, NotFoundError } from "./errors";
 
 export interface BookDoc extends BaseDoc {
   title: String;
@@ -18,6 +18,14 @@ export default class BookConcept {
       sort: { dateUpdated: -1 },
     });
     return books;
+  }
+
+  async getBookByTitle(title: string) {
+    const book = await this.books.readOne({ title: title });
+    if (book === null) {
+      throw new NotFoundError(`Book not found!`);
+    }
+    return book;
   }
 
   async updateInfo(_id: ObjectId, update: Partial<BookDoc>) {
