@@ -3,51 +3,30 @@ import DocCollection, { BaseDoc } from "../framework/doc";
 
 export interface RatingDoc extends BaseDoc {
   owner: ObjectId;
-  name: String;
-  items: ObjectId[];
+  book: ObjectId;
+  value: number;
 }
 
 export default class RatingConcept {
   public readonly ratings = new DocCollection<RatingDoc>("folders");
 
-  async getFolders(query: Filter<RatingDoc>) {
-    const folders = await this.ratings.readMany(query, {
-      sort: { dateUpdated: -1 },
-    });
-    return folders;
+  async getRatings(query: Filter<RatingDoc>) {
+    const ratings = await this.ratings.readMany(query);
+    return ratings;
   }
 
-  async getUserFolderContents(query: Filter<RatingDoc>) {
-    const items = await this.ratings.readMany(query, {
-      sort: { dateUpdated: -1 },
-    });
-    return items;
-  }
-
-  async addNewFolder(owner: ObjectId, name: String) {
-    const _id = await this.ratings.createOne({ owner, name });
-    return { msg: "Folder successfully created!", folder: await this.ratings.readOne({ _id }) };
-  }
-
-  async addToFolder(query: Filter<RatingDoc>, owner: ObjectId, name: String, items: ObjectId[]) {
-    const folders = await this.ratings.readMany(query, {
-      sort: { dateUpdated: -1 },
-    });
-    for (const folder of folders) {
-      folder.items.concat(items);
+  async addRating(user: ObjectId, bookId: ObjectId, value: number) {
+    // first check if rating already exists for this book and user:
+    const rating = await this.ratings.readOne({ owner: user, book: bookId });
+    if (rating !== null) {
+      throw new Error(`rating for this book by this user already exists!`);
     }
-    return { msg: "Added item to folder!" };
+    const _id = await this.ratings.createOne({ owner: user, book: bookId, value });
+    return { msg: "Rating successfully created!", folder: await this.ratings.readOne({ _id }) };
   }
 
-  async removeFromFolder(query: Filter<RatingDoc>, owner: ObjectId, name: String, items: ObjectId[]) {
-    const folders = await this.ratings.readMany(query, {
-      sort: { dateUpdated: -1 },
-    });
-    for (const folder of folders) {
-      folder.items = folder.items.filter(function (x) {
-        return !items.includes(x);
-      });
-    }
-    return { msg: "Removed item from folder!" };
+  async deleteRating(user: ObjectId, bookId: ObjectId) {
+    await this.ratings.deleteOne({ owner: user, book: bookId });
+    return { msg: "Post deleted successfully!" };
   }
 }

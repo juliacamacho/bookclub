@@ -29,14 +29,6 @@ export default class Responses {
   }
 
   /**
-   * Same as {@link post} but for an array of PostDoc for improved performance.
-   */
-  // static async books(posts: BookDoc[]) {
-  //   const authors = await User.idsToUsernames(posts.map((post) => post.author));
-  //   return posts.map((post, i) => ({ ...post, author: authors[i] }));
-  // }
-
-  /**
    * Convert FriendRequestDoc into more readable format for the frontend
    * by converting the ids into usernames.
    */

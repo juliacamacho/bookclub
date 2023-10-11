@@ -114,7 +114,7 @@ const operations: operation[] = [
     fields: { username: "input", folderName: "input" },
   },
   {
-    name: "Update Folder",
+    name: "Add To Folder",
     endpoint: "/api/user/:username/folders/:folderName",
     method: "PATCH",
     fields: { username: "input", folderName: "input", bookIds: "input" },

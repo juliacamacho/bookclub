@@ -1,53 +1,40 @@
 import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
+import { NotAllowedError } from "./errors";
 
 export interface InvitationDoc extends BaseDoc {
-  owner: ObjectId;
-  name: String;
-  items: ObjectId[];
+  userFrom: ObjectId;
+  usersPending: ObjectId[];
+  usersAccepted: ObjectId[];
+  book: ObjectId;
 }
 
-export default class InvitationConcept {
+export default class RatingConcept {
   public readonly invitations = new DocCollection<InvitationDoc>("folders");
 
-  async getFolders(query: Filter<InvitationDoc>) {
-    const folders = await this.invitations.readMany(query, {
-      sort: { dateUpdated: -1 },
-    });
-    return folders;
+  async getInvitations(query: Filter<InvitationDoc>) {
+    const invitations = await this.invitations.readMany(query);
+    return invitations;
   }
 
-  async getUserFolderContents(query: Filter<InvitationDoc>) {
-    const items = await this.invitations.readMany(query, {
-      sort: { dateUpdated: -1 },
-    });
-    return items;
+  async postInvitation(userFrom: ObjectId, book: ObjectId) {
+    const _id = await this.invitations.createOne({ userFrom, usersPending: [], usersAccepted: [], book });
+    return { msg: "Invitation successfully created!", folder: await this.invitations.readOne({ _id }) };
   }
 
-  async addNewFolder(owner: ObjectId, name: String) {
-    const _id = await this.invitations.createOne({ owner, name });
-    return { msg: "Folder successfully created!", folder: await this.invitations.readOne({ _id }) };
+  async updateInvitation(_id: ObjectId, update: Partial<InvitationDoc>) {
+    this.sanitizeUpdate(update);
+    await this.invitations.updateOne({ _id }, update);
+    return { msg: "Invitation successfully updated!" };
   }
 
-  async addToFolder(query: Filter<InvitationDoc>, owner: ObjectId, name: String, items: ObjectId[]) {
-    const folders = await this.invitations.readMany(query, {
-      sort: { dateUpdated: -1 },
-    });
-    for (const folder of folders) {
-      folder.items.concat(items);
+  private sanitizeUpdate(update: Partial<InvitationDoc>) {
+    // Make sure the update cannot change the author.
+    const allowedUpdates = ["usersPending", "usersAccepted"];
+    for (const key in update) {
+      if (!allowedUpdates.includes(key)) {
+        throw new NotAllowedError(`Cannot update '${key}' field!`);
+      }
     }
-    return { msg: "Added item to folder!" };
-  }
-
-  async removeFromFolder(query: Filter<InvitationDoc>, owner: ObjectId, name: String, items: ObjectId[]) {
-    const folders = await this.invitations.readMany(query, {
-      sort: { dateUpdated: -1 },
-    });
-    for (const folder of folders) {
-      folder.items = folder.items.filter(function (x) {
-        return !items.includes(x);
-      });
-    }
-    return { msg: "Removed item from folder!" };
   }
 }

@@ -188,7 +188,7 @@ class Routes {
   }
 
   @Router.patch("/user/:username/folders/:folderName")
-  async updateFolder(session: WebSessionDoc, username: string, folderName: string, bookIds: ObjectId[]) {
+  async addToFolder(session: WebSessionDoc, username: string, folderName: string, bookIds: ObjectId[]) {
     const userId = (await User.getUserByUsername(username))._id;
     return await Folder.addToFolder({ owner: userId, name: folderName }, bookIds);
     // todo: also add syncs
