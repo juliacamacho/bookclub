@@ -2,7 +2,9 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Post, User, WebSession } from "./app";
+import { Folder, Book, Friend, Post, User, WebSession } from "./app";
+import { BookDoc } from "./concepts/book";
+// import { FolderDoc } from "./concepts/folder";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -138,18 +140,25 @@ class Routes {
   }
 
   @Router.get("/books")
-  async getBooks(session: WebSessionDoc) {
-    return;
+  async getBooks(title?: string) {
+    let books;
+    if (title) {
+      books = await Book.getBooks({ title });
+    } else {
+      books = await Book.getBooks({});
+    }
+    return books;
+    // return Responses.posts(posts);
   }
 
   @Router.patch("/books/:_id")
-  async updateBook(session: WebSessionDoc, _id: ObjectId) {
-    return;
+  async updateBook(_id: ObjectId, update: Partial<BookDoc>) {
+    return await Book.updateInfo(_id, update);
   }
 
   @Router.post("/books/:_id/rating")
-  async addRating(session: WebSessionDoc, _id: ObjectId) {
-    return;
+  async addRating(_id: ObjectId) {
+    // return await Book.updateInfo(_id, update);
   }
 
   @Router.post("/books/:_id/recommend")
@@ -157,19 +166,33 @@ class Routes {
     return;
   }
 
-  @Router.get("/user/folders")
-  async getUserFolders(session: WebSessionDoc) {
-    return;
+  @Router.get("/user/:username/folders")
+  async getUserFolders(session: WebSessionDoc, username: string) {
+    const userId = (await User.getUserByUsername(username))._id;
+    const folders = await Folder.getFolders({ owner: userId });
+    return folders;
+    // return Responses.posts(posts);
   }
 
-  @Router.get("/user/folders/:folderName")
-  async getUserFolderContents(session: WebSessionDoc, folderName: String) {
-    return;
+  @Router.get("/user/:username/folders/:folderName")
+  async getUserFolderContents(session: WebSessionDoc, username: string, folderName: string) {
+    const userId = (await User.getUserByUsername(username))._id;
+    const items = await Folder.getUserFolderContents({ owner: userId, name: folderName });
+    return items;
   }
 
-  @Router.patch("/books/:_id/:folderName")
-  async updateFolder(session: WebSessionDoc, _id: ObjectId, folderName: String) {
-    return;
+  @Router.post("/user/:username/folders/:folderName")
+  async addFolder(username: string, folderName: string) {
+    const userId = (await User.getUserByUsername(username))._id;
+    return await Folder.addNewFolder(userId, folderName);
+  }
+
+  @Router.patch("/user/:username/folders/:folderName")
+  async updateFolder(session: WebSessionDoc, username: string, folderName: string, bookIds: ObjectId[]) {
+    const userId = (await User.getUserByUsername(username))._id;
+    return await Folder.addToFolder({ owner: userId, name: folderName }, bookIds);
+    // todo: also add syncs
+    // how to add and use $addToSet with $each modifier?
   }
 
   @Router.get("/user/recommendations")

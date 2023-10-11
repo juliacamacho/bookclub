@@ -54,6 +54,12 @@ const operations: operation[] = [
     fields: { username: "input" },
   },
   {
+    name: "Send Friend Request",
+    endpoint: "/api/friend/requests/:to",
+    method: "POST",
+    fields: { to: "input" },
+  },
+  {
     name: "Get Posts (empty for all)",
     endpoint: "/api/posts",
     method: "GET",
@@ -76,6 +82,42 @@ const operations: operation[] = [
     endpoint: "/api/posts/:id",
     method: "DELETE",
     fields: { id: "input" },
+  },
+  {
+    name: "Get Books (empty for all)",
+    endpoint: "/api/books",
+    method: "GET",
+    fields: { title: "input" },
+  },
+  {
+    name: "Update Book",
+    endpoint: "/api/books/:id",
+    method: "PATCH",
+    fields: { id: "input", update: { numberOfReviews: "input", avgRating: "input" } },
+  },
+  {
+    name: "Get User Folders",
+    endpoint: "/api/user/:username/folders",
+    method: "GET",
+    fields: { username: "input" },
+  },
+  {
+    name: "Get User Folder Contents",
+    endpoint: "/api/user/:username/folders/:folderName",
+    method: "GET",
+    fields: { username: "input", folderName: "input" },
+  },
+  {
+    name: "Add Folder for User",
+    endpoint: "/api/user/:username/folders/:folderName",
+    method: "POST",
+    fields: { username: "input", folderName: "input" },
+  },
+  {
+    name: "Update Folder",
+    endpoint: "/api/user/:username/folders/:folderName",
+    method: "PATCH",
+    fields: { username: "input", folderName: "input", bookIds: "input" },
   },
 ];
 

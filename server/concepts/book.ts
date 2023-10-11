@@ -28,7 +28,7 @@ export default class BookConcept {
 
   private sanitizeUpdate(update: Partial<BookDoc>) {
     // Make sure the update cannot change the title, author, or description.
-    const allowedUpdates = ["avgRating"];
+    const allowedUpdates = ["numberOfReviews", "avgRating"];
     for (const key in update) {
       if (!allowedUpdates.includes(key)) {
         throw new NotAllowedError(`Cannot update '${key}' field!`);
