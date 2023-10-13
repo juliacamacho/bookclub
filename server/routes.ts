@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Invitation, Rec, Folder, Book, Friend, Post, User, WebSession } from "./app";
+import { Rating, Invitation, Rec, Folder, Book, Friend, Post, User, WebSession } from "./app";
 import { BookDoc } from "./concepts/book";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
@@ -156,8 +156,15 @@ class Routes {
   }
 
   @Router.post("/books/:_id/rating")
-  async addRating(_id: ObjectId) {
-    // return await Book.updateInfo(_id, update);
+  async addRating(session: WebSessionDoc, _id: ObjectId, value: string) {
+    const user = WebSession.getUser(session);
+    return await Rating.addRating(user, _id, Number(value));
+  }
+
+  @Router.delete("/books/:_id/rating")
+  async deleteRating(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Rating.deleteRating(user, _id);
   }
 
   @Router.get("/user/:username/folders")
