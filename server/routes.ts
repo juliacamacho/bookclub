@@ -104,34 +104,34 @@ class Routes {
     return await Friend.removeFriend(user, friendId);
   }
 
-  @Router.get("/friend/requests")
+  @Router.get("/friends/requests")
   async getRequests(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     return await Responses.friendRequests(await Friend.getRequests(user));
   }
 
-  @Router.post("/friend/requests/:to")
+  @Router.post("/friends/requests/:to")
   async sendFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
     return await Friend.sendRequest(user, toId);
   }
 
-  @Router.delete("/friend/requests/:to")
+  @Router.delete("/friends/requests/:to")
   async removeFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
     return await Friend.removeRequest(user, toId);
   }
 
-  @Router.put("/friend/accept/:from")
+  @Router.put("/friends/accept/:from")
   async acceptFriendRequest(session: WebSessionDoc, from: string) {
     const user = WebSession.getUser(session);
     const fromId = (await User.getUserByUsername(from))._id;
     return await Friend.acceptRequest(fromId, user);
   }
 
-  @Router.put("/friend/reject/:from")
+  @Router.put("/friends/reject/:from")
   async rejectFriendRequest(session: WebSessionDoc, from: string) {
     const user = WebSession.getUser(session);
     const fromId = (await User.getUserByUsername(from))._id;
@@ -203,24 +203,27 @@ class Routes {
     return await Rec.sendRec(userFromId, userToId, bookId);
   }
 
-  @Router.get("/user/:username/invitations/received")
-  async getUserInvitationsReceived(username: string) {
-    const userId = (await User.getUserByUsername(username))._id;
-    const invitations = await Invitation.getInvitations({ usersPending: userId });
+  @Router.get("/invitations/received")
+  async getUserInvitationsReceived(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const invitations = await Invitation.getInvitations({ usersPending: user });
     return invitations;
   }
 
-  @Router.get("/user/:username/invitations/posted")
-  async getUserInvitationsPosted(username: string) {
-    const userId = (await User.getUserByUsername(username))._id;
-    const invitations = await Invitation.getInvitations({ userFrom: userId });
+  @Router.get("/invitations/posted")
+  async getUserInvitationsPosted(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const invitations = await Invitation.getInvitations({ userFrom: user });
     return invitations;
   }
 
   @Router.post("/books/:bookId/invitation")
   async postInvitation(session: WebSessionDoc, bookId: ObjectId) {
     const user = WebSession.getUser(session);
-    return await Invitation.postInvitation(user, bookId);
+    // get user's friends' ids
+    const friends = await Friend.getFriends(user);
+    // actually post the invitation
+    return await Invitation.postInvitation(user, friends, bookId);
   }
 
   @Router.patch("/invitations/:_id/accept")

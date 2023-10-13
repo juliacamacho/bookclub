@@ -10,15 +10,15 @@ export interface InvitationDoc extends BaseDoc {
 }
 
 export default class InvitationConcept {
-  public readonly invitations = new DocCollection<InvitationDoc>("folders");
+  public readonly invitations = new DocCollection<InvitationDoc>("invitations");
 
   async getInvitations(query: Filter<InvitationDoc>) {
     const invitations = await this.invitations.readMany(query);
     return invitations;
   }
 
-  async postInvitation(userFrom: ObjectId, book: ObjectId) {
-    const _id = await this.invitations.createOne({ userFrom, usersPending: [], usersAccepted: [], book });
+  async postInvitation(userFrom: ObjectId, usersTo: ObjectId[], book: ObjectId) {
+    const _id = await this.invitations.createOne({ userFrom, usersPending: [...usersTo], usersAccepted: [], book });
     return { msg: "Invitation successfully created!", folder: await this.invitations.readOne({ _id }) };
   }
 

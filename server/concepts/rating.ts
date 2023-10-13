@@ -8,7 +8,7 @@ export interface RatingDoc extends BaseDoc {
 }
 
 export default class RatingConcept {
-  public readonly ratings = new DocCollection<RatingDoc>("folders");
+  public readonly ratings = new DocCollection<RatingDoc>("ratings");
 
   async getRatings(query: Filter<RatingDoc>) {
     const ratings = await this.ratings.readMany(query);
