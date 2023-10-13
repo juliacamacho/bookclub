@@ -1,5 +1,6 @@
 import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
+import { NotAllowedError } from "./errors";
 
 export interface RatingDoc extends BaseDoc {
   owner: ObjectId;
@@ -19,7 +20,7 @@ export default class RatingConcept {
     // first check if rating already exists for this book and user:
     const rating = await this.ratings.readOne({ owner: user, book: bookId });
     if (rating !== null) {
-      throw new Error(`Rating for this book by this user already exists!`);
+      throw new NotAllowedError(`Rating for this book by this user already exists!`);
     }
     const _id = await this.ratings.createOne({ owner: user, book: bookId, value });
     return { msg: "Rating successfully created!", folder: await this.ratings.readOne({ _id }) };
