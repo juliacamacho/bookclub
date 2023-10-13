@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
 import { Rating, Invitation, Rec, Folder, Book, Friend, Post, User, WebSession } from "./app";
-import { BookDoc } from "./concepts/book";
+// import { BookDoc } from "./concepts/book";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -150,10 +150,20 @@ class Routes {
     // return Responses.posts(posts);
   }
 
-  @Router.patch("/books/:_id")
-  async updateBook(_id: ObjectId, update: Partial<BookDoc>) {
-    return await Book.updateInfo(_id, update);
+  @Router.post("/books")
+  async addBook(title: string, author: string, description: string) {
+    return await Book.addBook(title, author, description);
   }
+
+  @Router.delete("/books/:_id")
+  async deleteBook(_id: ObjectId) {
+    return await Book.deleteBook(_id);
+  }
+
+  // @Router.patch("/books/:_id")
+  // async updateBook(_id: ObjectId, update: Partial<BookDoc>) {
+  //   return await Book.updateInfo(_id, update);
+  // }
 
   @Router.post("/books/:_id/rating")
   async addRating(session: WebSessionDoc, _id: ObjectId, value: string) {

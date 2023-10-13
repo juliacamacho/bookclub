@@ -126,10 +126,34 @@ const operations: operation[] = [
     fields: { title: "input" },
   },
   {
-    name: "Update Book",
+    name: "Add Book",
+    endpoint: "/api/books",
+    method: "POST",
+    fields: { title: "input", author: "input", description: "input" },
+  },
+  {
+    name: "Delete Book",
     endpoint: "/api/books/:id",
-    method: "PATCH",
-    fields: { id: "input", update: { numberOfReviews: "input", avgRating: "input" } },
+    method: "DELETE",
+    fields: { id: "input" },
+  },
+  // {
+  //   name: "Update Book",
+  //   endpoint: "/api/books/:id",
+  //   method: "PATCH",
+  //   fields: { id: "input", update: { numberOfReviews: "input", avgRating: "input" } },
+  // },
+  {
+    name: "Add Rating",
+    endpoint: "/api/books/:id/rating",
+    method: "POST",
+    fields: { id: "input", value: "input" },
+  },
+  {
+    name: "Delete Rating",
+    endpoint: "/api/books/:id/rating",
+    method: "DELETE",
+    fields: { id: "input" },
   },
   {
     name: "Get User Folders",

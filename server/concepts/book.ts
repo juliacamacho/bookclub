@@ -6,8 +6,6 @@ export interface BookDoc extends BaseDoc {
   title: String;
   author: String;
   description: String;
-  numberOfReviews: Number;
-  avgRating: Number;
 }
 
 export default class BookConcept {
@@ -28,19 +26,13 @@ export default class BookConcept {
     return book;
   }
 
-  async updateInfo(_id: ObjectId, update: Partial<BookDoc>) {
-    this.sanitizeUpdate(update);
-    await this.books.updateOne({ _id }, update);
-    return { msg: "Book info successfully updated!" };
+  async addBook(title: string, author: string, description: string) {
+    const _id = await this.books.createOne({ title, author, description });
+    return { msg: "Book successfully created!", book: await this.books.readOne({ _id }) };
   }
 
-  private sanitizeUpdate(update: Partial<BookDoc>) {
-    // Make sure the update cannot change the title, author, or description.
-    const allowedUpdates = ["numberOfReviews", "avgRating"];
-    for (const key in update) {
-      if (!allowedUpdates.includes(key)) {
-        throw new NotAllowedError(`Cannot update '${key}' field!`);
-      }
-    }
+  async deleteBook(_id: ObjectId) {
+    await this.books.deleteOne({ _id });
+    return { msg: "Book deleted successfully!" };
   }
 }
