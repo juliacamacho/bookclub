@@ -63,7 +63,7 @@ const operations: operation[] = [
     name: "Remove Friend",
     endpoint: "/api/friends",
     method: "DELETE",
-    fields: {},
+    fields: { friend: "input" },
   },
   {
     name: "Get Friend Requests",
@@ -95,30 +95,30 @@ const operations: operation[] = [
     method: "PUT",
     fields: { from: "input" },
   },
-  {
-    name: "Get Posts (empty for all)",
-    endpoint: "/api/posts",
-    method: "GET",
-    fields: { author: "input" },
-  },
-  {
-    name: "Create Post",
-    endpoint: "/api/posts",
-    method: "POST",
-    fields: { content: "input" },
-  },
-  {
-    name: "Update Post",
-    endpoint: "/api/posts/:id",
-    method: "PATCH",
-    fields: { id: "input", update: { content: "input", options: { backgroundColor: "input" } } },
-  },
-  {
-    name: "Delete Post",
-    endpoint: "/api/posts/:id",
-    method: "DELETE",
-    fields: { id: "input" },
-  },
+  // {
+  //   name: "Get Posts (empty for all)",
+  //   endpoint: "/api/posts",
+  //   method: "GET",
+  //   fields: { author: "input" },
+  // },
+  // {
+  //   name: "Create Post",
+  //   endpoint: "/api/posts",
+  //   method: "POST",
+  //   fields: { content: "input" },
+  // },
+  // {
+  //   name: "Update Post",
+  //   endpoint: "/api/posts/:id",
+  //   method: "PATCH",
+  //   fields: { id: "input", update: { content: "input", options: { backgroundColor: "input" } } },
+  // },
+  // {
+  //   name: "Delete Post",
+  //   endpoint: "/api/posts/:id",
+  //   method: "DELETE",
+  //   fields: { id: "input" },
+  // },
   {
     name: "Get Books (empty for all)",
     endpoint: "/api/books",
@@ -143,6 +143,12 @@ const operations: operation[] = [
   //   method: "PATCH",
   //   fields: { id: "input", update: { numberOfReviews: "input", avgRating: "input" } },
   // },
+  {
+    name: "Get Ratings",
+    endpoint: "/api/ratings",
+    method: "GET",
+    fields: { bookId: "input" },
+  },
   {
     name: "Add Rating",
     endpoint: "/api/books/:id/rating",

@@ -13,7 +13,7 @@ export default class FolderConcept {
 
   async getFolders(query: Filter<FolderDoc>) {
     const folders = await this.folders.readMany(query, {
-      sort: { dateUpdated: -1 },
+      sort: { dateCreated: -1 },
     });
     return folders;
   }
@@ -21,9 +21,7 @@ export default class FolderConcept {
   async getUserFolderContents(query: Filter<FolderDoc>) {
     const folder = await this.folders.readOne(query);
     if (folder !== null) {
-      const items: ObjectId[] = [];
-      items.concat(folder.items);
-      return items;
+      return folder.items;
     } else {
       throw new NotFoundError(`Folder does not exist!`);
     }

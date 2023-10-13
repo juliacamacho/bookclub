@@ -29,7 +29,15 @@ class Routes {
   @Router.post("/users")
   async createUser(session: WebSessionDoc, username: string, password: string) {
     WebSession.isLoggedOut(session);
-    return await User.create(username, password);
+    const user = await User.create(username, password);
+    if (user !== null) {
+      await Folder.addNewFolder(user._id, "Read");
+      await Folder.addNewFolder(user._id, "To Read");
+      await Folder.addNewFolder(user._id, "Currently Reading");
+    } else {
+      return { msg: "Can't find user..." };
+    }
+    return { msg: "User successfully created!" };
   }
 
   @Router.patch("/users")
@@ -97,7 +105,7 @@ class Routes {
     return await User.idsToUsernames(await Friend.getFriends(user));
   }
 
-  @Router.delete("/friends/:friend")
+  @Router.delete("/friends")
   async removeFriend(session: WebSessionDoc, friend: string) {
     const user = WebSession.getUser(session);
     const friendId = (await User.getUserByUsername(friend))._id;
@@ -165,6 +173,11 @@ class Routes {
   //   return await Book.updateInfo(_id, update);
   // }
 
+  @Router.get("/ratings")
+  async getRatings(bookId: ObjectId) {
+    return await Rating.getRatings({ book: bookId });
+  }
+
   @Router.post("/books/:_id/rating")
   async addRating(session: WebSessionDoc, _id: ObjectId, value: string) {
     const user = WebSession.getUser(session);
@@ -202,7 +215,6 @@ class Routes {
   async addToFolder(username: string, folderName: string, bookId: ObjectId) {
     const userId = (await User.getUserByUsername(username))._id;
     return await Folder.addToFolder({ owner: userId, name: folderName }, bookId);
-    // todo: also add syncs
   }
 
   @Router.get("/user/:username/recommendations")
@@ -246,6 +258,10 @@ class Routes {
   @Router.patch("/invitations/:_id/accept")
   async acceptInvitation(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
+
+    // update user's Currently Reading folder
+    await Folder.addToFolder({ owner: user, name: "Currently Reading" }, _id);
+
     return await Invitation.acceptInvitation(_id, user);
   }
 

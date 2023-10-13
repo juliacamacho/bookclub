@@ -1,6 +1,6 @@
 import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError, NotFoundError } from "./errors";
+import { NotFoundError } from "./errors";
 
 export interface BookDoc extends BaseDoc {
   title: String;
@@ -13,7 +13,7 @@ export default class BookConcept {
 
   async getBooks(query: Filter<BookDoc>) {
     const books = await this.books.readMany(query, {
-      sort: { dateUpdated: -1 },
+      sort: { dateCreated: -1 },
     });
     return books;
   }

@@ -19,7 +19,7 @@ export default class RatingConcept {
     // first check if rating already exists for this book and user:
     const rating = await this.ratings.readOne({ owner: user, book: bookId });
     if (rating !== null) {
-      throw new Error(`rating for this book by this user already exists!`);
+      throw new Error(`Rating for this book by this user already exists!`);
     }
     const _id = await this.ratings.createOne({ owner: user, book: bookId, value });
     return { msg: "Rating successfully created!", folder: await this.ratings.readOne({ _id }) };
@@ -27,6 +27,6 @@ export default class RatingConcept {
 
   async deleteRating(user: ObjectId, bookId: ObjectId) {
     await this.ratings.deleteOne({ owner: user, book: bookId });
-    return { msg: "Post deleted successfully!" };
+    return { msg: "Rating deleted successfully!" };
   }
 }
