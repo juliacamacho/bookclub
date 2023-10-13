@@ -127,9 +127,39 @@ const operations: operation[] = [
   },
   {
     name: "Send Recommendation",
-    endpoint: "/api/books/:id",
+    endpoint: "/api/books/:bookId",
     method: "POST",
-    fields: { id: "input", usernameTo: "input", usernameFrom: "input" },
+    fields: { bookId: "input", usernameTo: "input", usernameFrom: "input" },
+  },
+  {
+    name: "Get Invitiations Received",
+    endpoint: "/api/user/:username/invitations/received",
+    method: "GET",
+    fields: { username: "input" },
+  },
+  {
+    name: "Get Invitiations Posted",
+    endpoint: "/api/user/:username/invitations/posted",
+    method: "GET",
+    fields: { username: "input" },
+  },
+  {
+    name: "Post Invitation",
+    endpoint: "/api/books/:bookId/invitation",
+    method: "POST",
+    fields: { bookId: "input" },
+  },
+  {
+    name: "Accept Invitation",
+    endpoint: "/api/invitations/:id/accept",
+    method: "PATCH",
+    fields: { id: "input" },
+  },
+  {
+    name: "Decline Invitation",
+    endpoint: "/api/invitations/:id/decline",
+    method: "PATCH",
+    fields: { id: "input" },
   },
 ];
 

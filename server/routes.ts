@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Rec, Folder, Book, Friend, Post, User, WebSession } from "./app";
+import { Invitation, Rec, Folder, Book, Friend, Post, User, WebSession } from "./app";
 import { BookDoc } from "./concepts/book";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
@@ -161,7 +161,7 @@ class Routes {
   }
 
   @Router.get("/user/:username/folders")
-  async getUserFolders(session: WebSessionDoc, username: string) {
+  async getUserFolders(username: string) {
     const userId = (await User.getUserByUsername(username))._id;
     const folders = await Folder.getFolders({ owner: userId });
     return folders;
@@ -169,7 +169,7 @@ class Routes {
   }
 
   @Router.get("/user/:username/folders/:folderName")
-  async getUserFolderContents(session: WebSessionDoc, username: string, folderName: string) {
+  async getUserFolderContents(username: string, folderName: string) {
     const userId = (await User.getUserByUsername(username))._id;
     const items = await Folder.getUserFolderContents({ owner: userId, name: folderName });
     return items;
@@ -182,7 +182,7 @@ class Routes {
   }
 
   @Router.patch("/user/:username/folders/:folderName")
-  async addToFolder(session: WebSessionDoc, username: string, folderName: string, bookId: ObjectId) {
+  async addToFolder(username: string, folderName: string, bookId: ObjectId) {
     const userId = (await User.getUserByUsername(username))._id;
     return await Folder.addToFolder({ owner: userId, name: folderName }, bookId);
     // todo: also add syncs
@@ -195,28 +195,44 @@ class Routes {
     return recs;
   }
 
-  @Router.post("/books/:_id")
-  async sendRecommendation(_id: ObjectId, usernameTo: string, usernameFrom: string) {
-    console.log("data:", _id, usernameTo, usernameFrom);
+  @Router.post("/books/:bookId")
+  async sendRecommendation(bookId: ObjectId, usernameTo: string, usernameFrom: string) {
     const userToId = (await User.getUserByUsername(usernameTo))._id;
     const userFromId = (await User.getUserByUsername(usernameFrom))._id;
     // // const book = (await Book.getBookByTitle(bookTitle))._id;
-    return await Rec.sendRec(userFromId, userToId, _id);
+    return await Rec.sendRec(userFromId, userToId, bookId);
   }
 
-  @Router.get("/user/invitations/received")
-  async getUserInvitationsReceived(session: WebSessionDoc) {
-    return;
+  @Router.get("/user/:username/invitations/received")
+  async getUserInvitationsReceived(username: string) {
+    const userId = (await User.getUserByUsername(username))._id;
+    const invitations = await Invitation.getInvitations({ usersPending: userId });
+    return invitations;
   }
 
-  @Router.get("/user/invitations/posted")
-  async getUserInvitationPosted(session: WebSessionDoc) {
-    return;
+  @Router.get("/user/:username/invitations/posted")
+  async getUserInvitationsPosted(username: string) {
+    const userId = (await User.getUserByUsername(username))._id;
+    const invitations = await Invitation.getInvitations({ userFrom: userId });
+    return invitations;
   }
 
-  @Router.post("/user/invitations/posted")
-  async postInvitation(session: WebSessionDoc) {
-    return;
+  @Router.post("/books/:bookId/invitation")
+  async postInvitation(session: WebSessionDoc, bookId: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Invitation.postInvitation(user, bookId);
+  }
+
+  @Router.patch("/invitations/:_id/accept")
+  async acceptInvitation(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Invitation.acceptInvitation(_id, user);
+  }
+
+  @Router.patch("/invitations/:_id/decline")
+  async declineInvitation(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Invitation.declineInvitation(_id, user);
   }
 }
 

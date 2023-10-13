@@ -1,6 +1,6 @@
 import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError } from "./errors";
+import { NotFoundError } from "./errors";
 
 export interface InvitationDoc extends BaseDoc {
   userFrom: ObjectId;
@@ -9,7 +9,7 @@ export interface InvitationDoc extends BaseDoc {
   book: ObjectId;
 }
 
-export default class RatingConcept {
+export default class InvitationConcept {
   public readonly invitations = new DocCollection<InvitationDoc>("folders");
 
   async getInvitations(query: Filter<InvitationDoc>) {
@@ -22,19 +22,25 @@ export default class RatingConcept {
     return { msg: "Invitation successfully created!", folder: await this.invitations.readOne({ _id }) };
   }
 
-  async updateInvitation(_id: ObjectId, update: Partial<InvitationDoc>) {
-    this.sanitizeUpdate(update);
-    await this.invitations.updateOne({ _id }, update);
-    return { msg: "Invitation successfully updated!" };
+  async acceptInvitation(_id: ObjectId, userId: ObjectId) {
+    const invitation = await this.invitations.readOne({ _id });
+    if (invitation !== null) {
+      const newList = [...invitation.usersAccepted, userId];
+      await this.invitations.updateOne({ _id: invitation._id }, { usersAccepted: newList });
+      return { msg: "Accepted invitation!" };
+    } else {
+      throw new NotFoundError(`Invitation does not exist!`);
+    }
   }
 
-  private sanitizeUpdate(update: Partial<InvitationDoc>) {
-    // Make sure the update cannot change the author.
-    const allowedUpdates = ["usersPending", "usersAccepted"];
-    for (const key in update) {
-      if (!allowedUpdates.includes(key)) {
-        throw new NotAllowedError(`Cannot update '${key}' field!`);
-      }
+  async declineInvitation(_id: ObjectId, userId: ObjectId) {
+    const invitation = await this.invitations.readOne({ _id });
+    if (invitation !== null) {
+      const newList = invitation.usersPending.filter((id) => id !== userId);
+      await this.invitations.updateOne({ _id: invitation._id }, { usersPending: newList });
+      return { msg: "Declined invitation!" };
+    } else {
+      throw new NotFoundError(`Invitation does not exist!`);
     }
   }
 }
